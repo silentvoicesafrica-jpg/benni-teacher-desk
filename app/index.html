@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#243b64" />
+  <meta name="description" content="A practical local-first planning and assessment desk for a Ghanaian teacher." />
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <link rel="stylesheet" href="/styles.css" />
+  <title>Benni Teacher Assistant</title>
+</head>
+<body>
+  <section class="auth-gate" id="authGate">
+    <div class="auth-card">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span></span><i>✓</i></div>
+        <div>
+          <div class="eyebrow">BENNI TEACHER ASSISTANT</div>
+          <h1>Teacher Desk</h1>
+        </div>
+      </div>
+      <p class="eyebrow accent auth-kicker">PRIVATE TEACHER WORKSPACE</p>
+      <h2>Prepare your class work with confidence.</h2>
+      <p class="lead">Sign in with your Manus account to open the protected teacher workspace. If you do not have an account, the same flow offers sign-up.</p>
+      <button class="primary-btn full" id="loginBtn" type="button">Sign in or sign up <span>→</span></button>
+      <button class="secondary-btn full" id="localModeBtn" type="button">Continue in local mode</button>
+      <p class="field-help auth-local-note">Local mode works on this device only. It does not sync or share records.</p>
+      <p class="auth-note"><strong>Security note:</strong> your session is protected by the app server. Your records are offline-ready on this device, and the Storage workspace uses Google Drive for desktop for encrypted cloud backups.</p>
+      <p class="auth-status" id="authStatus" role="status"></p>
+    </div>
+  </section>
+
+  <div class="app-shell" id="appShell" hidden>
+    <header class="topbar">
+      <div class="brand-lockup">
+        <div class="brand-mark" aria-hidden="true"><span></span><i>✓</i></div>
+        <div>
+          <div class="eyebrow">BENNI TEACHER ASSISTANT</div>
+          <h1>Teacher Desk</h1>
+        </div>
+      </div>
+      <div class="top-actions">
+        <label class="compact-field"><span>Term</span><select id="termSelect"><option>Term 1</option><option>Term 2</option><option>Term 3</option></select></label>
+        <div class="account-chip"><span class="status-dot"></span><span id="accountName">Signed in</span><button class="text-btn" id="logoutBtn" type="button">Log out</button></div>
+        <button class="secondary-btn install-btn" id="installAppBtn" type="button" hidden>Install app</button>
+        <button class="icon-btn" id="settingsTopBtn" title="Open settings">⚙ <span>Settings</span></button>
+        <button class="icon-btn" id="backupBtn" title="Back up your work">↥ <span>Backup</span></button>
+      </div>
+    </header>
+
+    <div class="workspace-strip">
+      <div><span class="muted">Working class</span><strong id="workingClassLabel">Basic 4</strong></div>
+      <label class="class-picker"><span>Change class</span><select id="classSelect"></select></label>
+      <div class="privacy-note" id="storageStatus"><span class="status-dot"></span> Offline-ready · saved on this device</div>
+    </div>
+
+    <nav class="main-nav" aria-label="Main navigation">
+      <div class="sidebar-brand">
+        <div class="brand-mark" aria-hidden="true"><span></span><i>✓</i></div>
+        <div><div class="eyebrow accent">BENNI</div><strong>Teacher Desk</strong></div>
+      </div>
+      <div class="sidebar-label">Teacher desk</div>
+      <button class="nav-item active" data-view="dashboard"><span>⌂</span><b>Home</b></button>
+      <button class="nav-item" data-view="exams"><span>▤</span><b>Exams</b></button>
+      <button class="nav-item" data-view="planner"><span>▥</span><b>Planner</b></button>
+      <button class="nav-item" data-view="work"><span>✓</span><b>Work & Tests</b></button>
+      <button class="nav-item" data-view="scorebook"><span>▥</span><b>Scorebook</b></button>
+      <button class="nav-item" data-view="projects"><span>◇</span><b>Projects</b></button>
+      <button class="nav-item" data-view="inspection"><span>◎</span><b>Inspection</b></button>
+      <div class="sidebar-label">Resources</div>
+      <button class="nav-item" data-view="energizers"><span>⚡</span><b>Energizers</b></button>
+      <button class="nav-item" data-view="extras"><span>✦</span><b>Extras</b></button>
+      <button class="nav-item" data-view="storage"><span>☁</span><b>Storage</b></button>
+      <div class="sidebar-label">Account</div>
+      <button class="nav-item" data-view="settings"><span>⚙</span><b>Settings</b></button>
+      <div class="sidebar-note"><span class="status-dot"></span><div><strong>Local-first</strong><small>Saved on this device</small></div></div>
+    </nav>
+
+    <main>
+      <section class="view active" id="view-dashboard">
+        <div class="welcome-row">
+          <div>
+            <p class="eyebrow accent">YOUR TEACHER DESK</p>
+            <h2>Good work, Eddy.<br><em>Let’s put the evidence in place.</em></h2>
+            <p class="lead">Prepare your examination, record everyday learning, and see what is still missing before inspection.</p>
+          </div>
+          <div class="deadline-card"><span class="deadline-label">MONTH-END FOCUS</span><strong>Exams + evidence</strong><small>Draft first. Review before printing.</small></div>
+        </div>
+        <div class="alert-card" id="urgentAlert"></div>
+        <div class="section-heading"><div><span class="eyebrow">AT A GLANCE</span><h3>Evidence on this device</h3></div><button class="text-btn" data-go="inspection">View inspection →</button></div>
+        <div class="stat-grid" id="dashboardStats"></div>
+        <div class="two-col">
+          <article class="panel progress-panel"><div class="panel-title"><div><span class="eyebrow">SELECTED CLASS</span><h3 id="classProgressTitle">Basic 4 progress</h3></div><span class="pill" id="classProgressPill">0% recorded</span></div><div class="progress-track"><span id="classProgressBar"></span></div><div class="progress-labels"><span id="classProgressNote">Set your working targets in Inspection.</span><b id="classProgressCounts">0 / 8 items</b></div><div class="mini-list" id="classProgressList"></div></article>
+          <article class="panel next-panel"><div class="panel-title"><div><span class="eyebrow">NEXT BEST ACTION</span><h3 id="nextActionTitle">Start with your examination</h3></div><span class="action-number">01</span></div><p id="nextActionText">Use your scheme of work to create a draft question paper. The paper will remain clearly marked for your review.</p><button class="primary-btn" data-go="exams">Open exam builder <span>→</span></button></article>
+        </div>
+        <div class="section-heading recent-heading"><div><span class="eyebrow">RECENT RECORDS</span><h3>What you have logged</h3></div><button class="text-btn" data-go="work">See all →</button></div>
+        <div class="record-list" id="recentRecords"></div>
+      </section>
+
+      <section class="view" id="view-exams">
+        <div class="page-head"><div><span class="eyebrow accent">EXAMINATION PAPER BUILDER</span><h2>Prepare a paper without starting from zero.</h2><p class="lead">Choose the class and topics taught. The assistant will set the correct number of questions and give you a draft, answer key, and marking guide.</p></div><div class="draft-stamp">DRAFT<br><small>TEACHER REVIEW<br>REQUIRED</small></div></div>
+        <div class="exam-layout">
+          <form class="panel form-panel" id="examForm">
+            <div class="panel-title"><div><span class="eyebrow">STEP 1</span><h3>Paper setup</h3></div><span class="step-badge">1 of 3</span></div>
+            <label>Class<select id="examClass"></select></label>
+            <div class="form-grid"><label>Examination type<select id="examType"><option>End-of-term examination</option><option>Class test</option><option>Mid-term examination</option><option>Revision paper</option></select></label><label>Duration<input id="examDuration" value="1 hour 30 minutes" /></label></div>
+            <label>Paper title<input id="examTitle" value="ICT Examination" /></label>
+            <div class="field-block"><div class="field-label-row"><label>Topics taught</label><button type="button" class="text-btn" id="addTopicBtn">+ Add topic</button></div><div class="form-grid"><label>Topic source<select id="topicSource"><option value="taught">Taught or reviewed lessons</option><option value="completed">Topics with completed work</option><option value="all">All class topics</option></select></label><label>Quick topic<select id="quickTopicSelect" aria-label="Choose one topic to generate questions"><option value="">Choose one topic</option></select></label></div><label>Choose one or more topics<select id="examTopicSelect" multiple size="6" aria-label="Select topics taught for this paper"></select></label><div class="topic-list" id="topicList"></div><div class="storage-actions"><button type="button" class="secondary-btn" id="selectAllTopicsBtn">Select all shown</button><button type="button" class="secondary-btn" id="clearTopicsBtn">Clear topics</button><button type="button" class="primary-btn" id="generateTopicBtn">Generate questions</button></div><p class="field-help">For a class test, start with “Taught or reviewed lessons.” Select only the topics you actually covered. The next step lets you review and choose the final questions.</p></div>
+            <div class="form-grid"><label>School / teacher name<input id="examSchool" placeholder="Optional" /></label><label>Total marks<input id="examMarks" type="number" value="100" min="1" /></label></div>
+            <div class="form-grid"><label>Section A questions<input id="examQuestionCount" type="number" value="40" min="5" max="60" /></label><label>Section B questions<input id="examSectionBCount" type="number" value="6" min="0" max="12" /></label></div>
+            <div class="form-grid"><label>Difficulty<select id="examDifficulty"><option value="All">Mixed</option><option>Basic</option><option>Standard</option><option>Challenging</option></select></label><label>Question type<select id="examQuestionType"><option value="All">Mixed types</option><option>Multiple choice</option><option>True or false</option><option>Short answer</option><option>Matching</option><option>Practical</option><option>Structured</option><option>Scenario</option></select></label></div>
+            <p class="field-help">The builder will not repeat a question. If your selected topics do not contain enough unique questions for the requested count, it will ask you to add topics, broaden the filters, or reduce the count.</p>
+            <button class="primary-btn full" type="submit">Create draft paper <span>→</span></button>
+          </form>
+          <div class="exam-output"><div class="output-toolbar"><div><span class="eyebrow">STEP 2–3</span><h3 id="examOutputTitle">Your draft will appear here</h3></div><div class="toolbar-actions"><button class="secondary-btn" id="printExamBtn" disabled>Print</button><button class="secondary-btn" id="saveExamBtn" disabled>Save draft</button></div></div><div class="question-picker" id="questionPicker" hidden></div><div class="exam-preview empty-state" id="examPreview"><div class="empty-icon">▤</div><h3>No paper created yet</h3><p>Set up the paper on the left. Your question paper and marking guide will appear here.</p></div></div>
+        </div>
+        <div class="note-banner"><strong>Alignment note</strong><span>Use your approved NaCCA curriculum and school scheme as the final authority. This first version records your topics and gives a curriculum-notes field; it does not invent official reference codes.</span></div>
+      </section>
+
+      <section class="view" id="view-planner">
+        <div class="page-head compact"><div><span class="eyebrow accent">12-WEEK PLANNER</span><h2>Know what to teach and what evidence to keep.</h2><p class="lead">Add one clear weekly outcome at a time. Planner topics are automatically available in the examination builder.</p></div><div class="toolbar-actions"><button class="secondary-btn" id="loadFoundationsBtn">Load Saturday foundations</button><button class="primary-btn" id="addLessonBtn">+ Add lesson</button></div></div>
+        <div class="note-banner"><strong>Simple rule</strong><span>Each week should show the outcome, the learner activity, the evidence you will see, and the resource or offline alternative.</span></div>
+        <div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>Week</th><th>Topic & outcome</th><th>Activity</th><th>Evidence</th><th>Status</th><th></th></tr></thead><tbody id="lessonTable"></tbody></table></div><div class="empty-state small" id="lessonEmpty"><div class="empty-icon">▥</div><h3>No weekly lessons recorded</h3><p>Add the first lesson you plan or have taught for this class, or load the Saturday foundations track.</p></div></div>
+      </section>
+
+      <section class="view" id="view-work">
+        <div class="page-head compact"><div><span class="eyebrow accent">WORK & TESTS</span><h2>Keep a simple record of what learners have done.</h2><p class="lead">Record exercises, classwork, homework, assignments, and class tests as you complete them.</p></div><button class="primary-btn" id="addWorkBtn">+ Add record</button></div>
+        <div class="filter-row"><div class="filter-tabs" id="workFilters"><button class="filter-tab active" data-filter="All">All</button><button class="filter-tab" data-filter="Exercise">Exercises</button><button class="filter-tab" data-filter="Class test">Class tests</button><button class="filter-tab" data-filter="Homework">Homework</button><button class="filter-tab" data-filter="Assignment">Assignments</button></div><input class="search-input" id="workSearch" placeholder="Search topic or title" /></div>
+        <div class="work-summary" id="workSummary"></div>
+        <div class="panel table-panel"><div class="table-scroll"><table><thead><tr><th>Record</th><th>Class</th><th>Date</th><th>Topic</th><th>Status</th><th></th></tr></thead><tbody id="workTable"></tbody></table></div><div class="empty-state small" id="workEmpty" hidden><div class="empty-icon">✓</div><h3>No records match</h3><p>Add your first exercise or change the filter.</p></div></div>
+      </section>
+
+      <section class="view" id="view-scorebook">
+        <div class="page-head compact"><div><span class="eyebrow accent">SCOREBOOK</span><h2>Record scores without a complicated register.</h2><p class="lead">Use anonymous IDs while testing. Choose a class and assessment, then enter one learner at a time.</p></div></div>
+        <div class="score-layout"><form class="panel form-panel" id="scoreForm"><div class="panel-title"><div><span class="eyebrow">QUICK ENTRY</span><h3>Add a score</h3></div></div><label>Learner ID<input id="learnerId" placeholder="e.g. B4-001" required /></label><div class="form-grid"><label>Assessment<select id="scoreAssessment"><option>Class test</option><option>Exercise</option><option>Homework</option><option>Project</option><option>Examination</option></select></label><label>Score<input id="scoreValue" type="number" min="0" required /></label></div><div class="form-grid"><label>Maximum score<input id="scoreMax" type="number" min="1" value="20" required /></label><label>Date<input id="scoreDate" type="date" required /></label></div><label>Comment<input id="scoreComment" placeholder="Optional teacher note" /></label><button class="primary-btn full" type="submit">Save score <span>→</span></button></form><div class="panel score-panel"><div class="panel-title"><div><span class="eyebrow">CURRENT CLASS</span><h3 id="scorebookTitle">Basic 4 score records</h3></div><span class="pill" id="scoreAverage">No scores yet</span></div><div class="table-scroll"><table><thead><tr><th>Learner ID</th><th>Assessment</th><th>Score</th><th>%</th><th>Date</th><th></th></tr></thead><tbody id="scoreTable"></tbody></table></div><div class="empty-state small" id="scoreEmpty"><div class="empty-icon">▥</div><h3>No scores recorded</h3><p>Use anonymous IDs until your workflow is trusted.</p></div></div></div>
+      </section>
+
+      <section class="view" id="view-projects">
+        <div class="page-head compact"><div><span class="eyebrow accent">PROJECT WORK</span><h2>Give practical work a clear trail.</h2><p class="lead">Track the title, deadline, evidence, and feedback so project work counts as real learning.</p></div><button class="primary-btn" id="addProjectBtn">+ Add project</button></div>
+        <div class="project-grid" id="projectGrid"></div>
+        <div class="empty-state" id="projectEmpty" hidden><div class="empty-icon">◇</div><h3>No project work recorded</h3><p>Add a project with a simple rubric and deadline.</p></div>
+      </section>
+
+      <section class="view" id="view-inspection">
+        <div class="page-head compact"><div><span class="eyebrow accent">INSPECTION DESK</span><h2>See your evidence before someone asks for it.</h2><p class="lead">These are working targets you can change. They are not presented as official GES requirements.</p></div><button class="secondary-btn" id="editTargetsBtn">Edit targets</button></div>
+        <div class="inspection-banner" id="inspectionBanner"></div>
+        <div class="inspection-grid"><div class="panel"><div class="panel-title"><div><span class="eyebrow">SELECTED CLASS</span><h3 id="inspectionClassTitle">Basic 4</h3></div><span class="pill" id="inspectionReadyPill">In progress</span></div><div id="inspectionBars"></div></div><div class="panel checklist-panel"><div class="panel-title"><div><span class="eyebrow">BEFORE THE VISIT</span><h3>Readiness checklist</h3></div></div><label class="check-row"><input type="checkbox" data-check="scheme" /> Scheme of work available</label><label class="check-row"><input type="checkbox" data-check="exercise" /> Exercise books / evidence organised</label><label class="check-row"><input type="checkbox" data-check="tests" /> Class test records updated</label><label class="check-row"><input type="checkbox" data-check="exam" /> Examination papers and marking guides ready</label><label class="check-row"><input type="checkbox" data-check="projects" /> Project work and rubrics available</label><p class="field-help">This checklist is saved on this device.</p></div></div>
+        <div class="section-heading"><div><span class="eyebrow">BY CLASS</span><h3>Evidence coverage</h3></div></div><div class="coverage-table panel"><div class="table-scroll"><table><thead><tr><th>Class</th><th>Exercises</th><th>Class tests</th><th>Assignments</th><th>Projects</th><th>Overall</th></tr></thead><tbody id="coverageTable"></tbody></table></div></div>
+      </section>
+
+      <section class="view" id="view-extras">
+        <div class="page-head compact"><div><span class="eyebrow accent">EXTRACURRICULAR LIBRARY</span><h2>Pathways with a real starting point.</h2><p class="lead">Choose a pathway, see the six starter sessions, then load only what fits your class, resources and school plan.</p></div><button class="primary-btn" id="addExtraBtn">+ Add my own idea</button></div>
+        <div class="source-note"><strong>How to use this library</strong><span>These pathways are teacher-designed optional enrichment. The source links show the curriculum or institutional evidence that informed the idea; your school’s approved plan remains the final authority.</span></div>
+        <div class="extra-library-toolbar"><label class="extra-search"><span>Find a pathway</span><input id="extraSearch" type="search" placeholder="Try sewing, solar or coding" /></label><label class="extra-filter"><span>Category</span><select id="extraFilter"><option value="All">All pathways</option><option>Digital skills</option><option>Practical trade</option><option>Creative arts</option><option>Food and environment</option><option>Green skills</option><option>Technical skills</option><option>Technical design</option><option>Enterprise</option><option>Life skills</option></select></label><span class="library-count" id="extraCount">12 pathways</span></div>
+        <div class="extra-grid" id="extraGrid"></div>
+      </section>
+
+      <section class="view" id="view-energizers">
+        <div class="page-head compact"><div><span class="eyebrow accent">CLASS ENERGIZERS</span><h2>Bring the class back on track.</h2><p class="lead">Choose the class, topic and available time. These are optional, low-stakes activities—not examination questions.</p></div><span class="pill good">KG2–Basic 9</span></div>
+        <div class="source-note"><strong>Teacher control</strong><span>Activities are curriculum-linked teacher-designed ideas. Check the activity against your lesson, equipment, learner needs and school safeguarding rules before starting.</span></div>
+        <div class="energizer-controls panel"><label>Class<select id="energizerClassSelect"></select></label><label>Topic<select id="energizerTopicSelect"></select></label><label>Time<select id="energizerDurationSelect"><option value="All">Any length</option><option value="10">10 minutes</option><option value="20">20 minutes</option><option value="30">30 minutes</option></select></label></div>
+        <div class="section-heading"><div><span class="eyebrow">READY-TO-USE ACTIVITIES</span><h3 id="energizerCount">Activities shown</h3></div></div>
+        <div class="energizer-grid" id="energizerGrid"></div>
+      </section>
+
+      <section class="view" id="view-storage">
+        <div class="page-head compact"><div><span class="eyebrow accent">CLOUD BACKUP</span><h2>Your work stays local, with an encrypted copy in Google Drive.</h2><p class="lead">The app works offline first. When Google Drive for desktop is running, choose a synchronized folder and save an encrypted backup there. The app never uploads learner records or passwords as readable files.</p></div><span class="pill" id="storageModePill">Local-first</span></div>
+        <div class="two-col storage-layout">
+          <article class="panel"><div class="panel-title"><div><span class="eyebrow">RECOMMENDED PATH</span><h3>Google Drive encrypted backup</h3></div><span class="card-icon">☁</span></div><p class="lead">Install Google Drive for desktop on Windows and add a folder such as <b>Eddy_Teacher_Assistant_Backups</b> to Drive sync. The app writes a password-protected backup file into that folder; Google Drive then synchronizes it.</p><ol class="storage-steps"><li>Install and sign in to Google Drive for desktop.</li><li>Choose or create a private Drive-synchronized backup folder.</li><li>Use the button below to choose that folder in this browser.</li><li>Save an encrypted backup after important work and keep one occasional external-drive copy.</li></ol><div class="storage-actions"><button class="primary-btn" id="chooseCloudFolderBtn" type="button">Choose Google Drive folder <span>↗</span></button><button class="primary-btn" id="saveCloudBackupBtn" type="button">Save encrypted cloud backup <span>↥</span></button><button class="secondary-btn" id="syncExportBtn" type="button">Download encrypted backup <span>↥</span></button><button class="secondary-btn" id="openBackupBtn" type="button">Open backup tools</button></div><div class="backup-status" id="cloudBackupStatus"></div></article>
+          <article class="panel"><div class="panel-title"><div><span class="eyebrow">BACKUP HEALTH</span><h3>Know when you are protected</h3></div><span class="pill" id="syncLastPill">No cloud backup yet</span></div><div class="backup-health" id="backupHealthDetails"></div><p class="field-help">The warning becomes active when no encrypted cloud backup has been saved in the last 7 days. This is a reminder, not a claim that your local work is lost.</p><form id="storagePlanForm"><label>Backup folder label<input id="storageLabel" name="label" placeholder="e.g. Eddy Teacher Assistant Backups" /></label><button class="secondary-btn full" type="submit">Save backup label <span>→</span></button></form><p class="field-help">Do not enter Google passwords here. Sign in through Google Drive for desktop or the browser folder chooser only.</p><div class="source-note"><strong>Privacy rule</strong><span>Keep learner names, medical information, passwords, and other sensitive data out of ordinary cloud documents. The app backup is encrypted, but your backup password must be kept safely.</span></div></article>
+        </div>
+        <div class="note-banner"><strong>How this works</strong><span>Google Drive is the cloud copy. The laptop and phone do not need an external hard drive connected during normal use. An external drive is only an occasional second backup, and the app remains usable when offline.</span></div>
+      </section>
+
+      <section class="view" id="view-settings">
+        <div class="page-head compact"><div><span class="eyebrow accent">SETTINGS</span><h2>Make the teacher desk fit your way of working.</h2><p class="lead">Change appearance and privacy choices here. These settings are saved on this device and do not change your examination records.</p></div></div>
+        <div class="two-col settings-layout">
+          <article class="panel"><div class="panel-title"><div><span class="eyebrow">APPEARANCE</span><h3>Comfortable for phone or laptop</h3></div><span class="card-icon">✦</span></div><label>Theme<select id="settingsTheme"><option value="light">Warm light</option><option value="midnight">Midnight blue</option><option value="contrast">High contrast</option></select></label><label>Spacing<select id="settingsDensity"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label><label class="check-row"><input type="checkbox" id="settingsReduceMotion" /> Reduce movement and animations</label></article>
+          <article class="panel"><div class="panel-title"><div><span class="eyebrow">PRIVACY & ACCESS</span><h3>Know where your records live</h3></div><span class="pill good" id="settingsAccessPill">Local device</span></div><p id="settingsAccessText" class="lead">Your records are stored in this browser. Use encrypted backup before changing device or browser.</p><ul class="settings-list"><li>Do not enter full learner names when anonymous IDs are enough.</li><li>Use encrypted backup for portable protected copies.</li><li>Cloud sync is not active until your private laptop storage is tested.</li></ul><button class="secondary-btn" id="settingsBackupBtn">Open backup and encryption tools</button></article>
+        </div>
+        <div class="two-col settings-layout"><article class="panel"><div class="panel-title"><div><span class="eyebrow">APP BEHAVIOUR</span><h3>Helpful defaults</h3></div></div><label class="check-row"><input type="checkbox" id="settingsConfirmDelete" checked /> Ask before deleting records</label><label class="check-row"><input type="checkbox" id="settingsAutoSave" checked /> Save changes automatically</label><button class="secondary-btn" id="settingsInstallBtn">Install app on this device</button></article><article class="panel"><div class="panel-title"><div><span class="eyebrow">ACCOUNT</span><h3 id="settingsAccountName">Teacher</h3></div></div><p class="field-help">Protected mode uses your Manus account. Local mode is for working immediately on this device when sign-in is unavailable.</p><button class="secondary-btn" id="returnSignInBtn">Return to sign-in screen</button><button class="text-btn" id="settingsLogoutBtn">Sign out of Manus account</button></article></div>
+      </section>
+    </main>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="modal-backdrop" id="modalBackdrop" hidden><div class="modal" role="dialog" aria-modal="true"><button class="modal-close" id="modalClose" aria-label="Close">×</button><div id="modalContent"></div></div></div>
+  <input type="file" id="importFile" accept="application/json" hidden />
+  <script src="/extra-curriculum.js"></script>
+  <script src="/energizers.js"></script>
+  <script src="/question-bank.js"></script>
+  <script src="/backup-validation.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+# Automatic check: runs every time code is pushed or a pull request is opened.
+# It checks the JavaScript syntax and runs the tests. If anything fails, GitHub shows a red mark.
+name: Check app
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Check JavaScript syntax
+        run: |
+          for f in app/app.js app/backup-validation.js app/question-bank.js app/energizers.js app/extra-curriculum.js app/sw.js app/server.mjs; do
+            node --check "$f"
+          done
+
+      - name: Run tests
+        env:
+          APP_DIR: app
+        run: node --test tests/patch.test.mjs
