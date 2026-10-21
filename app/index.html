@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#243b64" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; manifest-src 'self'; worker-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'" />
   <meta name="description" content="A practical local-first planning and assessment desk for a Ghanaian teacher." />
+  <link rel="icon" href="./public/icons/icon-192.png" />
   <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="stylesheet" href="./styles.css" />
   <title>Benni Teacher Assistant</title>
@@ -21,11 +23,11 @@
       </div>
       <p class="eyebrow accent auth-kicker">PRIVATE TEACHER WORKSPACE</p>
       <h2>Prepare your class work with confidence.</h2>
-      <p class="lead">Sign in with your Manus account to open the protected teacher workspace. If you do not have an account, the same flow offers sign-up.</p>
-      <button class="primary-btn full" id="loginBtn" type="button">Sign in or sign up <span>→</span></button>
+      <p class="lead">Open the teacher workspace on this device. Your records stay in this browser.</p>
+      <button class="primary-btn full" id="loginBtn" type="button" hidden>Sign in or sign up <span>→</span></button>
       <button class="secondary-btn full" id="localModeBtn" type="button">Continue in local mode</button>
       <p class="field-help auth-local-note">Local mode works on this device only. It does not sync or share records.</p>
-      <p class="auth-note"><strong>Security note:</strong> your session is protected by the app server. Your records are offline-ready on this device, and the Storage workspace uses Google Drive for desktop for encrypted cloud backups.</p>
+      <p class="auth-note"><strong>Privacy:</strong> nothing you type is sent to a server. Encrypted backups can go to your own Google Drive folder. <button class="text-btn" id="authPrivacyBtn" type="button">Read the privacy policy</button></p>
       <p class="auth-status" id="authStatus" role="status"></p>
     </div>
   </section>
@@ -176,9 +178,9 @@
         <div class="page-head compact"><div><span class="eyebrow accent">SETTINGS</span><h2>Make the teacher desk fit your way of working.</h2><p class="lead">Change appearance and privacy choices here. These settings are saved on this device and do not change your examination records.</p></div></div>
         <div class="two-col settings-layout">
           <article class="panel"><div class="panel-title"><div><span class="eyebrow">APPEARANCE</span><h3>Comfortable for phone or laptop</h3></div><span class="card-icon">✦</span></div><label>Theme<select id="settingsTheme"><option value="light">Warm light</option><option value="midnight">Midnight blue</option><option value="contrast">High contrast</option></select></label><label>Spacing<select id="settingsDensity"><option value="comfortable">Comfortable</option><option value="compact">Compact</option></select></label><label class="check-row"><input type="checkbox" id="settingsReduceMotion" /> Reduce movement and animations</label></article>
-          <article class="panel"><div class="panel-title"><div><span class="eyebrow">PRIVACY & ACCESS</span><h3>Know where your records live</h3></div><span class="pill good" id="settingsAccessPill">Local device</span></div><p id="settingsAccessText" class="lead">Your records are stored in this browser. Use encrypted backup before changing device or browser.</p><ul class="settings-list"><li>Do not enter full learner names when anonymous IDs are enough.</li><li>Use encrypted backup for portable protected copies.</li><li>Cloud sync is not active until your private laptop storage is tested.</li></ul><button class="secondary-btn" id="settingsBackupBtn">Open backup and encryption tools</button></article>
+          <article class="panel"><div class="panel-title"><div><span class="eyebrow">PRIVACY & ACCESS</span><h3>Know where your records live</h3></div><span class="pill good" id="settingsAccessPill">Local device</span></div><p id="settingsAccessText" class="lead">Your records are stored in this browser. Use encrypted backup before changing device or browser.</p><ul class="settings-list"><li>Do not enter full learner names when anonymous IDs are enough.</li><li>Use encrypted backup for portable protected copies.</li><li>Cloud sync is not active until your private laptop storage is tested.</li></ul><button class="secondary-btn" id="settingsBackupBtn">Open backup and encryption tools</button> <button class="secondary-btn" id="privacyPolicyBtn">Read the privacy policy</button></article>
         </div>
-        <div class="two-col settings-layout"><article class="panel"><div class="panel-title"><div><span class="eyebrow">APP BEHAVIOUR</span><h3>Helpful defaults</h3></div></div><label class="check-row"><input type="checkbox" id="settingsConfirmDelete" checked /> Ask before deleting records</label><label class="check-row"><input type="checkbox" id="settingsAutoSave" checked /> Save changes automatically</label><button class="secondary-btn" id="settingsInstallBtn">Install app on this device</button></article><article class="panel"><div class="panel-title"><div><span class="eyebrow">ACCOUNT</span><h3 id="settingsAccountName">Teacher</h3></div></div><p class="field-help">Protected mode uses your Manus account. Local mode is for working immediately on this device when sign-in is unavailable.</p><button class="secondary-btn" id="returnSignInBtn">Return to sign-in screen</button><button class="text-btn" id="settingsLogoutBtn">Sign out of Manus account</button></article></div>
+        <div class="two-col settings-layout"><article class="panel"><div class="panel-title"><div><span class="eyebrow">APP BEHAVIOUR</span><h3>Helpful defaults</h3></div></div><label class="check-row"><input type="checkbox" id="settingsConfirmDelete" checked /> Ask before deleting records</label><label class="check-row"><input type="checkbox" id="settingsAutoSave" checked /> Save changes automatically</label><button class="secondary-btn" id="settingsInstallBtn">Install app on this device</button></article><article class="panel"><div class="panel-title"><div><span class="eyebrow">ACCOUNT</span><h3 id="settingsAccountName">Teacher</h3></div></div><p class="field-help">This version runs in local mode on this device. Sign-in will return in a later version that has a server.</p><button class="secondary-btn" id="returnSignInBtn">Return to sign-in screen</button><button class="text-btn" id="settingsLogoutBtn">Leave local mode and sign-in screen</button></article></div>
       </section>
     </main>
   </div>

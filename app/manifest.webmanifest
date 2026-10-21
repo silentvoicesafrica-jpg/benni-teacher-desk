@@ -10,11 +10,11 @@
   "description": "A practical local-first planning and assessment desk for a Ghanaian teacher.",
   "categories": ["education", "productivity"],
   "icons": [
-    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
-    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+    { "src": "./public/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "./public/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
   "shortcuts": [
-    { "name": "Exam builder", "short_name": "Exams", "url": "./#exams", "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }] },
-    { "name": "Storage", "short_name": "Storage", "url": "./#storage", "icons": [{ "src": "./icons/icon-192.png", "sizes": "192x192" }] }
+    { "name": "Exam builder", "short_name": "Exams", "url": "./#exams", "icons": [{ "src": "./public/icons/icon-192.png", "sizes": "192x192" }] },
+    { "name": "Storage", "short_name": "Storage", "url": "./#storage", "icons": [{ "src": "./public/icons/icon-192.png", "sizes": "192x192" }] }
   ]
 }

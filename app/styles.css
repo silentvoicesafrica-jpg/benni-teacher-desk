@@ -348,3 +348,6 @@ td strong { font-size: 13px; }
 .backup-ok { background:color-mix(in srgb, var(--green) 14%, transparent); color:var(--ink); }
 .storage-actions { flex-wrap:wrap; }
 .storage-actions .primary-btn, .storage-actions .secondary-btn { flex:1 1 210px; }
+
+/* Phase A: the hidden attribute must always hide, even on buttons with their own display rule. */
+[hidden] { display: none !important; }

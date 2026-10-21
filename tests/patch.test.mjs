@@ -109,3 +109,50 @@ test('a single topic cannot build a full paper', () => {
   const pool = buildQuestionBank('KG2', ['What is ICT?']);
   assert.ok(pool.length < ruleFor('KG2').a);
 });
+
+// ---- Phase A: static local-first build ----
+const indexHtml = fs.readFileSync(path.join(appDir, 'index.html'), 'utf8');
+const appJs = fs.readFileSync(path.join(appDir, 'app.js'), 'utf8');
+const swJs = fs.readFileSync(path.join(appDir, 'sw.js'), 'utf8');
+
+test('Phase A: Content Security Policy blocks other origins and eval', () => {
+  const m = indexHtml.match(/http-equiv="Content-Security-Policy" content="([^"]+)"/);
+  assert.ok(m, 'CSP meta tag is present');
+  const policy = m[1];
+  assert.match(policy, /default-src 'self'/);
+  assert.match(policy, /script-src 'self'(;|$)/);
+  assert.doesNotMatch(policy, /unsafe-eval/);
+  assert.match(policy, /object-src 'none'/);
+});
+
+test('Phase A: no inline script blocks and no remote scripts in index.html', () => {
+  assert.doesNotMatch(indexHtml, /<script(?![^>]*\bsrc=)[^>]*>/i, 'every script tag loads a file');
+  for (const [, src] of indexHtml.matchAll(/<script[^>]*\bsrc="([^"]+)"/g)) {
+    assert.match(src, /^\.\//, `script ${src} is a relative app file`);
+  }
+});
+
+test('Phase A: sign-in to Manus is switched off for the static build', () => {
+  assert.match(appJs, /const SIGN_IN_ENABLED = false;/);
+  assert.match(indexHtml, /id="loginBtn"[^>]*hidden/);
+  assert.match(appJs, /if \(!SIGN_IN_ENABLED\) \{/);
+});
+
+test('Phase A: links work at any address (no root-relative app paths)', () => {
+  assert.doesNotMatch(indexHtml, /(href|src)="\/[^/]/);
+  
+  assert.match(appJs, /register\('sw\.js'\)/);
+  assert.doesNotMatch(swJs, /'\/(app\.js|index\.html|styles\.css)'/);
+});
+
+test('Phase A: privacy policy exists and says nothing is sent to a server', () => {
+  assert.match(appJs, /PRIVACY_POLICY_HTML = `/);
+  assert.match(appJs, /nothing you type is sent over the internet/i);
+  assert.match(indexHtml, /id="privacyPolicyBtn"/);
+});
+
+test('Phase A: typed values put into HTML attributes are escaped', () => {
+  // Any data-* attribute built from a record id must go through esc().
+  const raw = appJs.match(/data-[a-z-]+="\$\{(?!esc\()[^}]+\}/g) || [];
+  assert.deepEqual(raw, [], `unescaped attributes: ${raw.join(', ')}`);
+});

@@ -26,6 +26,9 @@ const freshState = () => ({
   targets: Object.fromEntries(CLASS_LIST.map(c => [c, { Exercise: 4, 'Class test': 2, Assignment: 1, Project: 1 }])),
   checks: Object.fromEntries(CLASS_LIST.map(c => [c, { scheme: false, exercise: false, tests: false, exam: false, projects: false }]))
 });
+// Manus sign-in needs the Node server (server.mjs). GitHub Pages has no server,
+// so the static version runs in local mode only. Set to true only when a server is deployed.
+const SIGN_IN_ENABLED = false;
 let authUser = null;
 let state = loadState();
 let currentDraft = null;
@@ -71,6 +74,13 @@ function showAuthenticatedWorkspace() {
 }
 async function bootstrapAuth() {
   applySettings();
+  if (!SIGN_IN_ENABLED) {
+    document.getElementById('loginBtn').hidden = true;
+    if (localStorage.getItem('benniLocalMode') === '1') { authUser = { openId: 'local', name: 'Local teacher', email: '' }; showAuthenticatedWorkspace(); return; }
+    document.getElementById('authGate').hidden = false;
+    document.getElementById('appShell').hidden = true;
+    return;
+  }
   try { const config = await fetch('/api/auth/config', { cache: 'no-store' }).then(response => response.json()); if (config.localMode === false) { localStorage.removeItem('benniLocalMode'); const localButton = document.getElementById('localModeBtn'); if (localButton) localButton.hidden = true; const note = document.querySelector('.auth-local-note'); if (note) note.hidden = true; if (!config.configured) setAuthMessage('Private sign-in is not configured on this deployment yet.'); } } catch {}
   if (localStorage.getItem('benniLocalMode') === '1') { authUser = { openId: 'local', name: 'Local teacher', email: '' }; showAuthenticatedWorkspace(); return; }
   const authParam = new URLSearchParams(window.location.search).get('auth');
@@ -145,7 +155,7 @@ function renderPlanner() {
   const empty = document.getElementById('lessonEmpty');
   if (!table || !empty) return;
   const rows = (state.lessonPlans || []).filter(p => p.className === state.currentClass).sort((a, b) => Number(a.week) - Number(b.week));
-  table.innerHTML = rows.map(p => `<tr><td><strong>Week ${esc(p.week)}</strong><br><span class="muted">${esc(p.term)}</span></td><td><strong>${esc(p.topic)}</strong><br><span class="muted">${esc(p.outcome)}</span><br><span class="extra-tag">${esc(p.track || 'Regular class')}</span></td><td>${esc(p.activity || '—')}<br><span class="muted">${esc(p.resource || '')}</span></td><td>${esc(p.evidence || '—')}</td><td><button class="status-badge ${p.status.toLowerCase().replace(' ', '-')}" data-lesson-toggle="${p.id}">${esc(p.status)}</button></td><td><button class="table-action" data-lesson-edit="${p.id}" title="Edit lesson">✎</button><button class="table-action" data-lesson-delete="${p.id}" title="Delete lesson">×</button></td></tr>`).join('');
+  table.innerHTML = rows.map(p => `<tr><td><strong>Week ${esc(p.week)}</strong><br><span class="muted">${esc(p.term)}</span></td><td><strong>${esc(p.topic)}</strong><br><span class="muted">${esc(p.outcome)}</span><br><span class="extra-tag">${esc(p.track || 'Regular class')}</span></td><td>${esc(p.activity || '—')}<br><span class="muted">${esc(p.resource || '')}</span></td><td>${esc(p.evidence || '—')}</td><td><button class="status-badge ${esc(p.status.toLowerCase().replace(' ', '-'))}" data-lesson-toggle="${esc(p.id)}">${esc(p.status)}</button></td><td><button class="table-action" data-lesson-edit="${esc(p.id)}" title="Edit lesson">✎</button><button class="table-action" data-lesson-delete="${esc(p.id)}" title="Delete lesson">×</button></td></tr>`).join('');
   empty.hidden = Boolean(rows.length);
 }
 
@@ -158,7 +168,7 @@ function renderDashboard() {
     ['Scores recorded', state.scores.length, 'Use anonymous IDs while testing', '▥'],
     ['Projects', state.projects.length, 'Practical work with a trail', '◇']
   ];
-  document.getElementById('dashboardStats').innerHTML = stats.map(([label, num, note, mark]) => `<div class="stat-card" data-mark="${mark}"><span class="eyebrow">${esc(label)}</span><div class="stat-num">${num}</div><div class="stat-label">${esc(note)}</div></div>`).join('');
+  document.getElementById('dashboardStats').innerHTML = stats.map(([label, num, note, mark]) => `<div class="stat-card" data-mark="${esc(mark)}"><span class="eyebrow">${esc(label)}</span><div class="stat-num">${num}</div><div class="stat-label">${esc(note)}</div></div>`).join('');
   const target = state.targets[state.currentClass] || { Exercise: 4, 'Class test': 2, Assignment: 1, Project: 1 };
   const current = selected.Exercise + selected['Class test'] + selected.Assignment + selected.Project;
   const targetTotal = target.Exercise + target['Class test'] + target.Assignment + target.Project;
@@ -301,8 +311,8 @@ function renderWork() {
   const search = (document.getElementById('workSearch')?.value || '').toLowerCase();
   const filtered = state.workRecords.filter(r => (activeWorkFilter === 'All' || r.type === activeWorkFilter) && (!search || `${r.title} ${r.topic} ${r.className}`.toLowerCase().includes(search)));
   const types = ['Exercise', 'Class test', 'Homework', 'Assignment'];
-  document.getElementById('workSummary').innerHTML = types.map(t => `<div class="summary-chip"><strong>${state.workRecords.filter(r => r.type === t && isCompleted(r.status)).length}</strong><span>${t}${t === 'Exercise' ? 's' : ''} completed</span></div>`).join('');
-  document.getElementById('workTable').innerHTML = filtered.map(r => `<tr><td><strong>${esc(r.title)}</strong><br><span class="muted">${esc(r.evidence || '')}</span></td><td>${esc(r.className)}</td><td>${formatDate(r.date)}</td><td>${esc(r.topic || '—')}</td><td><button class="status-badge ${r.status.toLowerCase().replace(' ', '-')}" data-record-action="toggle" data-id="${r.id}">${esc(r.status)}</button></td><td><button class="table-action" data-record-action="delete" data-id="${r.id}" title="Delete record">×</button></td></tr>`).join('');
+  document.getElementById('workSummary').innerHTML = types.map(t => `<div class="summary-chip"><strong>${state.workRecords.filter(r => r.type === t && isCompleted(r.status)).length}</strong><span>${esc(t)}${t === 'Exercise' ? 's' : ''} completed</span></div>`).join('');
+  document.getElementById('workTable').innerHTML = filtered.map(r => `<tr><td><strong>${esc(r.title)}</strong><br><span class="muted">${esc(r.evidence || '')}</span></td><td>${esc(r.className)}</td><td>${formatDate(r.date)}</td><td>${esc(r.topic || '—')}</td><td><button class="status-badge ${esc(r.status.toLowerCase().replace(' ', '-'))}" data-record-action="toggle" data-id="${esc(r.id)}">${esc(r.status)}</button></td><td><button class="table-action" data-record-action="delete" data-id="${esc(r.id)}" title="Delete record">×</button></td></tr>`).join('');
   document.getElementById('workEmpty').hidden = Boolean(filtered.length);
   document.querySelectorAll('#workFilters .filter-tab').forEach(b => b.classList.toggle('active', b.dataset.filter === activeWorkFilter));
 }
@@ -312,12 +322,12 @@ function renderScorebook() {
 document.getElementById('scorebookTitle').textContent = `${state.currentClass} score records`;
   document.getElementById('scoreAverage').textContent = avg === null ? 'No scores yet' : `${avg}% average`;
   document.getElementById('scoreAverage').className = `pill ${avg !== null && avg >= 50 ? 'good' : 'warn'}`;
-  document.getElementById('scoreTable').innerHTML = rows.map(s => `<tr><td><strong>${esc(s.learnerId)}</strong><br><span class="muted">${esc(s.comment || '')}</span></td><td>${esc(s.assessment)}</td><td>${s.score} / ${s.max}</td><td>${Math.round(s.score / s.max * 100)}%</td><td>${formatDate(s.date)}</td><td><button class="table-action" data-score-delete="${s.id}">×</button></td></tr>`).join('');
+  document.getElementById('scoreTable').innerHTML = rows.map(s => `<tr><td><strong>${esc(s.learnerId)}</strong><br><span class="muted">${esc(s.comment || '')}</span></td><td>${esc(s.assessment)}</td><td>${s.score} / ${s.max}</td><td>${Math.round(s.score / s.max * 100)}%</td><td>${formatDate(s.date)}</td><td><button class="table-action" data-score-delete="${esc(s.id)}">×</button></td></tr>`).join('');
   document.getElementById('scoreEmpty').style.display = rows.length ? 'none' : 'grid';
 }
 function renderProjects() {
   const projects = state.projects.filter(p => p.className === state.currentClass || !state.currentClass);
-  document.getElementById('projectGrid').innerHTML = projects.map(p => `<article class="project-card"><div class="project-card-head"><div class="card-icon">◇</div><button class="table-action" data-project-delete="${p.id}">×</button></div><h3>${esc(p.title)}</h3><p>${esc(p.description || 'No description added yet.')}</p><div class="card-meta"><span>${esc(p.className)}</span><span>Due ${formatDate(p.dueDate)}</span><span class="status-badge ${p.status.toLowerCase().replace(' ', '-')}">${esc(p.status)}</span></div><p class="field-help">Evidence: ${esc(p.evidence || 'Add evidence after learners present or submit work.')}</p></article>`).join('');
+  document.getElementById('projectGrid').innerHTML = projects.map(p => `<article class="project-card"><div class="project-card-head"><div class="card-icon">◇</div><button class="table-action" data-project-delete="${esc(p.id)}">×</button></div><h3>${esc(p.title)}</h3><p>${esc(p.description || 'No description added yet.')}</p><div class="card-meta"><span>${esc(p.className)}</span><span>Due ${formatDate(p.dueDate)}</span><span class="status-badge ${esc(p.status.toLowerCase().replace(' ', '-'))}">${esc(p.status)}</span></div><p class="field-help">Evidence: ${esc(p.evidence || 'Add evidence after learners present or submit work.')}</p></article>`).join('');
   document.getElementById('projectEmpty').hidden = projects.length > 0;
 }
 function renderInspection() {
@@ -346,7 +356,7 @@ function renderEnergizers() {
   classSelect.innerHTML = CLASS_LIST.map(cls => `<option value="${esc(cls)}" ${cls === selectedClass ? 'selected' : ''}>${esc(cls)}</option>`).join('');
   topicSelect.innerHTML = `<option value="All">All topics for ${esc(selectedClass)}</option>${[...new Set(activities.map(a => a.topic))].map(topic => `<option value="${esc(topic)}" ${topic === selectedTopic ? 'selected' : ''}>${esc(topic)}</option>`).join('')}`;
   document.getElementById('energizerCount').textContent = `${filtered.length} activit${filtered.length === 1 ? 'y' : 'ies'} shown`;
-  grid.innerHTML = filtered.length ? filtered.map((activity, index) => `<article class="energizer-card panel"><div class="energizer-card-head"><span class="extra-tag">${esc(activity.topic)}</span><span class="pathway-count">${activity.minutes.join(' / ')} min</span></div><h3>${esc(activity.title)}</h3><p>${esc(activity.instructions)}</p><div class="energizer-meta"><span><strong>Learner output:</strong> ${esc(activity.output)}</span><span><strong>Materials:</strong> ${esc(activity.materials)}</span><span><strong>Safety:</strong> ${esc(activity.safety)}</span></div><button class="primary-btn" data-start-energizer="${selectedClass}|${activities.indexOf(activity)}">Start this activity <span>→</span></button></article>`).join('') : `<div class="empty-state small"><div class="empty-icon">⚡</div><h3>No activity matches</h3><p>Choose another topic or time length.</p></div>`;
+  grid.innerHTML = filtered.length ? filtered.map((activity, index) => `<article class="energizer-card panel"><div class="energizer-card-head"><span class="extra-tag">${esc(activity.topic)}</span><span class="pathway-count">${activity.minutes.join(' / ')} min</span></div><h3>${esc(activity.title)}</h3><p>${esc(activity.instructions)}</p><div class="energizer-meta"><span><strong>Learner output:</strong> ${esc(activity.output)}</span><span><strong>Materials:</strong> ${esc(activity.materials)}</span><span><strong>Safety:</strong> ${esc(activity.safety)}</span></div><button class="primary-btn" data-start-energizer="${esc(selectedClass)}|${activities.indexOf(activity)}">Start this activity <span>→</span></button></article>`).join('') : `<div class="empty-state small"><div class="empty-icon">⚡</div><h3>No activity matches</h3><p>Choose another topic or time length.</p></div>`;
 }
 function openEnergizer(className, index) {
   const activity = ENERGIZER_LIBRARY?.[className]?.[Number(index)];
@@ -509,9 +519,9 @@ document.getElementById('extraSearch').addEventListener('input', event => { acti
 document.getElementById('extraFilter').addEventListener('change', event => { activeExtraFilter = event.target.value; renderExtras(); });
 document.getElementById('printExamBtn').addEventListener('click', () => window.print());
 document.getElementById('saveExamBtn').addEventListener('click', saveDraft);
-document.getElementById('loginBtn').addEventListener('click', () => { window.location.href = '/api/auth/login'; });
+document.getElementById('loginBtn').addEventListener('click', () => { if (SIGN_IN_ENABLED) window.location.href = '/api/auth/login'; });
 document.getElementById('localModeBtn').addEventListener('click', () => { localStorage.setItem('benniLocalMode', '1'); authUser = { openId: 'local', name: 'Local teacher', email: '' }; showAuthenticatedWorkspace(); showToast('Local mode is active on this device.'); });
-document.getElementById('logoutBtn').addEventListener('click', async () => { await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }); window.location.reload(); });
+document.getElementById('logoutBtn').addEventListener('click', async () => { if (SIGN_IN_ENABLED) await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).catch(() => {}); localStorage.removeItem('benniLocalMode'); window.location.reload(); });
 document.getElementById('storagePlanForm').addEventListener('submit', event => { event.preventDefault(); const f = new FormData(event.target); saveStoragePlan({ ...storagePlan(), provider: 'Google Drive', label: String(f.get('label') || '').trim() }); renderStorage(); showToast('Google Drive backup label saved.'); });
 document.getElementById('installAppBtn').addEventListener('click', async () => { if (!deferredInstallPrompt) { showToast('Use your browser menu and choose Add to Home screen.'); return; } deferredInstallPrompt.prompt(); await deferredInstallPrompt.userChoice; deferredInstallPrompt = null; document.getElementById('installAppBtn').hidden = true; });
 ['settingsTheme', 'settingsDensity', 'settingsReduceMotion', 'settingsConfirmDelete', 'settingsAutoSave'].forEach(id => document.getElementById(id)?.addEventListener('change', () => { const s = loadSettings(); const el = document.getElementById(id); if (id === 'settingsTheme') s.theme = el.value; if (id === 'settingsDensity') s.density = el.value; if (id === 'settingsReduceMotion') s.reduceMotion = el.checked; if (id === 'settingsConfirmDelete') s.confirmDelete = el.checked; if (id === 'settingsAutoSave') s.autoSave = el.checked; saveSettings(s); showToast('Settings saved on this device.'); }));
@@ -554,3 +564,8 @@ window.addEventListener('beforeinstallprompt', event => { event.preventDefault()
 window.addEventListener('online', updateConnectivity);
 window.addEventListener('offline', updateConnectivity);
 bootstrapAuth();
+
+// Plain-English privacy policy. Static text only: it never includes teacher or learner data.
+const PRIVACY_POLICY_HTML = `<div class="eyebrow accent">PRIVACY POLICY · last updated 21 October 2026</div><h2>Your records stay on your device</h2><p class="lead">Benni Teacher Assistant is a planning tool for teachers. It is not an official GES or NaCCA system.</p><h3>What the app stores</h3><ul><li>Lesson plans, class work, class tests, scores, projects and exam drafts that you type in.</li><li>Your settings, such as theme and spacing.</li></ul><p>This information is stored in the web browser on this device, using the browser's local storage.</p><h3>What is never sent</h3><ul><li>This version has no server. Nothing you type is sent over the internet to the app's authors or to any company.</li><li>No analytics, advertising or tracking code is used.</li></ul><h3>Encrypted backups</h3><ul><li>A backup is encrypted with the password you choose before it is saved.</li><li>If you save a backup to your own Google Drive folder, only the encrypted file goes there. Google Drive cannot read the contents.</li><li>The app never stores your backup password. If you forget it, the backup cannot be opened.</li></ul><h3>Learner information</h3><ul><li>Use anonymous learner IDs, not full names, wherever possible.</li><li>Do not share screenshots or backup files that contain learner information.</li></ul><h3>Deleting your data</h3><ul><li>Use the delete buttons inside the app, or clear this browser's site data.</li><li>Export an encrypted backup first if you want to keep your records.</li></ul><h3>Responsibility</h3><p>You, the teacher, are responsible for the records you keep and for checking every exam question and mark before use.</p>`;
+function showPrivacyPolicy() { openModal(PRIVACY_POLICY_HTML); }
+['privacyPolicyBtn', 'authPrivacyBtn'].forEach(id => document.getElementById(id)?.addEventListener('click', showPrivacyPolicy));
