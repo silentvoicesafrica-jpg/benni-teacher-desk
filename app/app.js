@@ -549,7 +549,7 @@ document.getElementById('importFile').addEventListener('change', event => {
 });
 document.addEventListener('keydown', event => { if (event.key === 'Escape' && !document.getElementById('modalBackdrop').hidden) closeModal(); });
 
-if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
+if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 window.addEventListener('beforeinstallprompt', event => { event.preventDefault(); deferredInstallPrompt = event; document.getElementById('installAppBtn').hidden = false; });
 window.addEventListener('online', updateConnectivity);
 window.addEventListener('offline', updateConnectivity);
