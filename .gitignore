@@ -3,3 +3,7 @@ node_modules/
 *.log
 .env
 .env.*
+
+# Tauri build output
+src-tauri/target/
+src-tauri/gen/
