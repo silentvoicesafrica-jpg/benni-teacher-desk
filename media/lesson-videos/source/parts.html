@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><title>Parts of a Computer</title>
+<style>
+  html,body{margin:0;height:100%;background:#0f1d36;font-family:Arial,Helvetica,sans-serif;color:#fff;overflow:hidden}
+  .scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;opacity:0;transform:scale(.96);transition:opacity .6s ease,transform .6s ease;padding:40px;box-sizing:border-box}
+  .scene.on{opacity:1;transform:scale(1)}
+  h1{font-size:88px;margin:0 0 18px;color:#ffd166;letter-spacing:1px}
+  h2{font-size:58px;margin:0 0 24px;color:#ffd166}
+  p{font-size:36px;margin:10px 0;line-height:1.35;max-width:1000px}
+  .big{font-size:120px;margin:10px 0}
+  .row{display:flex;gap:60px;justify-content:center;align-items:center;margin-top:20px}
+  .card{background:#1d3461;border-radius:28px;padding:26px 34px;min-width:230px;box-shadow:0 10px 0 #0a1428}
+  .card span{display:block;font-size:90px}
+  .card b{font-size:34px}
+  .bounce{animation:bob 1.6s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+  .tag{position:absolute;top:26px;left:34px;font-size:24px;background:#ffd166;color:#0f1d36;border-radius:999px;padding:6px 18px;font-weight:bold}
+  .cap{position:absolute;bottom:26px;left:0;right:0;font-size:26px;color:#cfd8ea}
+  .pop{display:inline-block;background:#06d6a0;color:#0f1d36;border-radius:16px;padding:10px 24px;font-weight:bold}
+  .ans{opacity:0;transition:opacity .5s}
+  .ans.on{opacity:1}
+  .box{width:420px;height:300px;border-radius:30px;background:#1d3461;margin:20px auto;position:relative;box-shadow:0 10px 0 #0a1428}
+  .light{position:absolute;top:24px;right:30px;width:30px;height:30px;border-radius:50%;background:#06d6a0;animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.2}}
+</style></head>
+<body>
+<div class="tag">Basic 4 · ICT · Computer parts</div>
+
+<section class="scene" data-d="6000"><h1>Parts of a Computer</h1><p>Meet the family of the computer.</p><div class="row"><div class="card bounce"><span>🖥️</span><b>Monitor</b></div><div class="card bounce" style="animation-delay:.2s"><span>⌨️</span><b>Keyboard</b></div><div class="card bounce" style="animation-delay:.4s"><span>🖱️</span><b>Mouse</b></div></div><div class="cap">Basic 4 · NaCCA indicator B4.1.1.1.1</div></section>
+
+<section class="scene" data-d="10000"><h2>The System Unit</h2><div class="box"><div class="light"></div></div><p>The <b>box</b> that holds the main parts of the computer.</p><p>Inside is the memory where work is kept.</p><div class="cap">Look at the box in your class. Point to the power light.</div></section>
+
+<section class="scene" data-d="12000"><h2>INPUT: Tell the computer</h2><div class="row"><div class="card bounce"><span>🖱️</span><b>Mouse</b></div><div class="card bounce" style="animation-delay:.2s"><span>⌨️</span><b>Keyboard</b></div><div class="card bounce" style="animation-delay:.4s"><span>🕹️</span><b>Joystick</b></div></div><p><span class="pop">Input</span> = you send information <b>in</b> to the computer.</p><div class="cap">Input devices: mouse, keyboard, joystick, light pen, microphone.</div></section>
+
+<section class="scene" data-d="12000"><h2>OUTPUT: The computer tells you</h2><div class="row"><div class="card bounce"><span>🖥️</span><b>Monitor</b></div><div class="card bounce" style="animation-delay:.2s"><span>🖨️</span><b>Printer</b></div><div class="card bounce" style="animation-delay:.4s"><span>🔊</span><b>Speakers</b></div></div><p><span class="pop">Output</span> = the computer shows or gives information <b>out</b> to you.</p><div class="cap">Quick memory trick: Input goes in. Output comes out.</div></section>
+
+<section class="scene" data-d="13000"><h2>RAM and ROM</h2><div class="row"><div class="card"><b>RAM</b><p style="font-size:28px;margin:12px 0">Temporary working desk.<br>Lost when the power goes off.</p></div><div class="card"><b>ROM</b><p style="font-size:28px;margin:12px 0">Permanent instruction book.<br>Stays when the power goes off.</p></div></div><div class="cap">Ask yourself: is it a working desk, or a book that stays?</div></section>
+
+<section class="scene" data-d="12000" id="quiz"><h2>Quick Quiz</h2><p>Which one is an <b>INPUT</b> device?</p><div class="row"><div class="card"><b>A. Monitor</b></div><div class="card"><b>B. Mouse</b></div><div class="card"><b>C. Printer</b></div></div><p class="ans" id="ans"><span class="pop">B. Mouse ✔</span> You use it to send information into the computer.</p><div class="cap">Pause the video and think first.</div></section>
+
+<section class="scene" data-d="6000"><h1>Well done!</h1><p>Input goes <b>in</b>. Output comes <b>out</b>.</p><p>Next lesson: the Windows desktop.</p><div class="cap">Teacher tip: ask learners to name one input and one output device in your classroom.</div></section>
+
+<script>
+  const scenes=[...document.querySelectorAll('.scene')];
+  let t=0; let i=0;
+  function show(k){ scenes.forEach(s=>s.classList.remove('on')); scenes[k].classList.add('on'); }
+  function next(){
+    show(i);
+    if(scenes[i].id==='quiz'){ setTimeout(()=>document.getElementById('ans').classList.add('on'), 6000); }
+    const d=parseInt(scenes[i].dataset.d,10);
+    i++;
+    if(i<scenes.length) setTimeout(next,d); else setTimeout(()=>{document.body.dataset.done='1'},d);
+  }
+  window.addEventListener('load',()=>setTimeout(next,300));
+</script>
+</body></html>

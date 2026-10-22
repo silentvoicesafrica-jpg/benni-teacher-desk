@@ -14,11 +14,11 @@ function loadScripts(files) {
   vm.createContext(ctx);
   for (const file of files) {
     const source = fs.readFileSync(path.join(appDir, file), 'utf8');
-    vm.runInContext(source + '\n;globalThis.__TOPIC_PROFILES = typeof TOPIC_PROFILES !== "undefined" ? TOPIC_PROFILES : undefined;', ctx, { filename: file });
+    vm.runInContext(source + '\n;globalThis.__TOPIC_PROFILES = typeof TOPIC_PROFILES !== "undefined" ? TOPIC_PROFILES : undefined; globalThis.__B4_QUESTION_BANK = typeof B4_QUESTION_BANK !== "undefined" ? B4_QUESTION_BANK : undefined;', ctx, { filename: file });
   }
   return ctx;
 }
-const sandbox = loadScripts(['question-bank.js', 'backup-validation.js']);
+const sandbox = loadScripts(['question-bank-b4.js', 'question-bank.js', 'backup-validation.js']);
 const {
   validateBackupState, encryptBackupPayload, decryptBackupEnvelope, hasTopicProfile,
   buildQuestionBank, __TOPIC_PROFILES
@@ -81,7 +81,7 @@ test('wrong envelope format is reported as format, not password', async () => {
 
 test('every default class topic has a deliberate question profile', () => {
   let count = 0;
-  for (const topics of Object.values(DEFAULT_TOPICS)) for (const topic of topics) { count++; assert.equal(hasTopicProfile(topic), true, topic); }
+  for (const [cls, topics] of Object.entries(DEFAULT_TOPICS)) for (const topic of topics) { count++; assert.equal(hasTopicProfile(topic, cls), true, `${cls}: ${topic}`); }
   assert.ok(count > 50);
 });
 
@@ -155,4 +155,40 @@ test('Phase A: typed values put into HTML attributes are escaped', () => {
   // Any data-* attribute built from a record id must go through esc().
   const raw = appJs.match(/data-[a-z-]+="\$\{(?!esc\()[^}]+\}/g) || [];
   assert.deepEqual(raw, [], `unescaped attributes: ${raw.join(', ')}`);
+});
+
+// ---- Basic 4 real question bank (NaCCA B4 indicators) ----
+test('Basic 4 bank: every official topic has at least 7 checked questions with a model answer', () => {
+  const bank = sandbox.__B4_QUESTION_BANK;
+  const topics = Object.keys(bank);
+  assert.equal(topics.length, 8, 'eight official Basic 4 topics');
+  for (const topic of topics) {
+    assert.ok(bank[topic].length >= 7, `${topic} has ${bank[topic].length} questions`);
+    for (const q of bank[topic]) {
+      assert.ok(q.answer && q.answer.trim().length > 0, `${q.id} has an answer`);
+      assert.ok(q.mapping.indicator.startsWith('B4.'), `${q.id} is linked to a B4 indicator`);
+      if (q.options) assert.ok(q.options.includes(q.answer), `${q.id}: answer is one of the options`);
+    }
+  }
+});
+
+test('Basic 4 bank: no repeated question text, and every topic is in the default list', () => {
+  const texts = Object.values(sandbox.__B4_QUESTION_BANK).flat().map(q => q.text.trim().toLowerCase());
+  assert.equal(new Set(texts).size, texts.length, 'no duplicate question text');
+  const defaults = DEFAULT_TOPICS['Basic 4'];
+  assert.deepEqual([...defaults].sort(), Object.keys(sandbox.__B4_QUESTION_BANK).sort());
+});
+
+test('Basic 4 paper: Section A (40) and Section B (5 structured) can be built from all topics', () => {
+  const topics = DEFAULT_TOPICS['Basic 4'];
+  const bank = sandbox.buildQuestionBank('Basic 4', topics);
+  assert.ok(bank.length >= 40, `pool has ${bank.length}`);
+  const structured = bank.filter(q => ['Structured', 'Practical', 'Scenario'].includes(q.type));
+  assert.ok(structured.length >= 5, `structured pool has ${structured.length}`);
+});
+
+test('Multiple choice: correct answers are not all in one position', () => {
+  const bank = sandbox.buildQuestionBank('Basic 4', DEFAULT_TOPICS['Basic 4']).filter(q => q.options);
+  const positions = new Set(bank.map(q => q.options.indexOf(q.answer)));
+  assert.ok(positions.size >= 3, `answers sit in ${positions.size} different positions`);
 });

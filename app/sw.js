@@ -1,5 +1,5 @@
-const CACHE = 'benni-teacher-v11-static-phase-a';
-const CORE = ['./', './index.html', './styles.css', './extra-curriculum.js', './energizers.js', './question-bank.js', './backup-validation.js', './app.js', './manifest.webmanifest', './public/icons/icon-192.png', './public/icons/icon-512.png'];
+const CACHE = 'benni-teacher-v12-b4-bank';
+const CORE = ['./', './index.html', './styles.css', './extra-curriculum.js', './energizers.js', './question-bank-b4.js', './question-bank.js', './backup-validation.js', './app.js', './manifest.webmanifest', './public/icons/icon-192.png', './public/icons/icon-512.png'];
 self.addEventListener('install', event => event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(CORE))));
 self.addEventListener('activate', event => event.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(key => key !== CACHE).map(key => caches.delete(key)))).then(() => self.clients.claim())));
 self.addEventListener('fetch', event => {

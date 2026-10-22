@@ -4,7 +4,7 @@ const DEFAULT_TOPICS = {
   'Basic 1': ['Computer parts', 'ICT at home and school', 'Mouse skills', 'Keyboard skills', 'Staying safe'],
   'Basic 2': ['Computer parts and uses', 'Mouse and keyboard practice', 'Digital safety', 'Drawing and colours', 'Technology around us'],
   'Basic 3': ['Introduction to computing', 'Computer parts and their uses', 'Keyboard and mouse skills', 'Word processing basics', 'Health and safety in ICT'],
-  'Basic 4': ['Computer input and output devices', 'Word processing', 'Presentation basics', 'Internet and responsible use', 'Health and safety in ICT'],
+  'Basic 4': ['Computer parts, input devices and memory', 'Desktop, taskbar and icons', 'Folders: create, name and rename', 'Data, information and sources', 'Data collection and simple calculations', 'Technology in our community', 'PowerPoint basics: a three-slide presentation', 'Word processing: Home tab tools'],
   'Basic 5': ['Output devices and digital devices', 'Word processing tools', 'Presentation tools', 'Electronic spreadsheet', 'Internet and email safety'],
   'Basic 6': ['Computer systems', 'Word processing and presentation', 'Spreadsheets', 'Email and internet', 'Digital literacy and privacy'],
   'Basic 7 / Form 1': ['Components of computers and computer systems', 'Technology in the community', 'Word processing', 'Introduction to presentation', 'Internet and social media', 'Information security'],
@@ -250,7 +250,7 @@ function createDraft() {
   const cls = document.getElementById('examClass').value;
   const topics = selectedExamTopics();
   if (!topics.length) { showToast('Choose at least one taught topic first.'); return; }
-  const unprofiled = topics.filter(topic => !hasTopicProfile(topic));
+  const unprofiled = topics.filter(topic => !hasTopicProfile(topic, cls));
   if (unprofiled.length) { showToast(`No question profile yet for: ${unprofiled.join(', ')}. Choose a listed topic. The app does not generate generic questions.`); return; }
   const rule = examRule(cls);
   const settings = selectedQuestionSettings();
